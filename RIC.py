@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 import requests
-
+import os
 import aiohttp
 import asyncio
 
@@ -123,4 +123,4 @@ async def userInfo(ctx, name):
                 await ctx.reply('**404 Player Not found**')
 
 
-client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.G4ygGK.DUuxYU1R6MpX-4Li6Ms38v6FOk7UlYHN0ouHMg')
+client.run(os.environ['DISCORD_TOKEN'])
