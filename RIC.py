@@ -9,11 +9,28 @@ import asyncio
 client = commands.Bot(command_prefix='.')
 
 
+# ONREADY
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 
+# HELP COMMAND
+# DISPLAY ALL THE COMMANDS
+# REPLY IN SAME CHANNEL
+@client.command(name='helpMe')
+async def my_help(ctx):
+    help_message = discord.Embed(
+        title="**CPMC Discord Bot :robot:**",
+        description='\n ** Commands: :loudspeaker:** \n\n **.contests :** for upcomming contests :trophy:\n\n **.info <username> :** for info of handle :person_bouncing_ball:\n\n **Thank you for using my services :smiley:**',
+        color=0xFFA500
+    )
+    await ctx.reply(embed=help_message)
+
+
+# CONTESTS COMMAND
+# GET ALL CONTESTS
+# REPLY IN SAME CHANNEL
 URL_codeforces = "https://kontests.net/api/v1/codeforces"
 URL_codechef = "https://kontests.net/api/v1/code_chef"
 URL_leetcode = "https://kontests.net/api/v1/leet_code"
@@ -53,18 +70,18 @@ codechef_display_list.reverse()
 
 leetcode_display_list = list(
     map(destructure_codeforces_leetcode, data_leetcode))
+leetcode_display_list.reverse()
 
 display_list = codeforces_display_list[0:2:] + \
-    codechef_display_list[0:2:] + leetcode_display_list[0:2:]
+               codechef_display_list[0:2:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
     dis = ''
-    i = 1
     for contest in display_list:
         dis = dis + \
-            f'{i}) **Name**: {contest[0]}\n \t**Date**: {contest[1]}\n\n'
-        i = i + 1
+              f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
+    dis+= '**Thank you for using my services :smiley:**\n\n'
     m = discord.Embed(
         title='\n**Upcoming Contests:**\n\n',
         description=dis,
@@ -73,6 +90,14 @@ def display(display_list):
     return m
 
 
+@client.command(name='contests')
+async def contest(ctx):
+    await ctx.reply(embed=display(display_list))
+
+
+# INFO COMMAND
+# GET USERINFO
+# REPLY IN DM
 @client.command(name='info')
 async def userInfo(ctx, name):
     async with aiohttp.ClientSession() as session:
@@ -88,17 +113,14 @@ async def userInfo(ctx, name):
                 cntry = data['country'] if 'country' in data else '\t'
                 rank = data['rank'] if 'rank' in data else '\t'
                 maxrt = data['maxRating'] if 'maxRating' in data else '\t'
-                m = discord.Embed(title='this is your info',
-                                  description=f'**Requested by** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n',
-                                  color=discord.Colour.green())
-                await ctx.reply(embed=m)
+                m = discord.Embed(
+                    title='this is your info',
+                    description=f'**Request for** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
+                    color=discord.Colour.green())
+                await ctx.message.author.send(embed=m)
+                await ctx.reply('**Info was successfully sent to you!!**')
             else:
                 await ctx.reply('**404 Player Not found**')
-
-
-@client.command(name='contests')
-async def contest(ctx):
-    await ctx.reply(embed=display(display_list))
 
 
 client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.G4ygGK.DUuxYU1R6MpX-4Li6Ms38v6FOk7UlYHN0ouHMg')
