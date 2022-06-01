@@ -3,6 +3,9 @@ from discord.ext import commands
 from datetime import datetime
 import requests
 
+import aiohttp
+import asyncio
+
 client = commands.Bot(command_prefix='.')
 
 
@@ -61,6 +64,23 @@ def display(display_list):
         i = i + 1
     return dis
 
+@client.command(name='info')
+async def userInfo(ctx, name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
+            data = await response.json()
+            data = data['result'][0]
+            print('data', data)
+            rating = data['rating']
+            ft = data['firstName']
+            lt = data['lastName']
+            cntry = data['country']
+            rank = data['rank']
+            maxrt = data['maxRating']
+    m = discord.Embed(title='this is your info',
+                      description=f'Firstname : {ft}\nLastname : {lt}\nLast Rating : {rating}\ncountry : {cntry}\nRank : {rank}\nMax Rating : {maxrt}',
+                      color=discord.Colour.green())
+    await ctx.reply(embed=m)
 
 @client.command(name='contests')
 async def contest(ctx):
