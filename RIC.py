@@ -26,22 +26,30 @@ data_codechef = request_codechef.json()
 data_leetcode = request_leetcode.json()
 
 
-
 def destructure_codeforces_leetcode(contest):
     date = contest['start_time'].split('T')[0]
     time = contest['start_time'].split('T')[1]
-    return [contest['name'], str(date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(
-        int(time[0:2:1]) + 6) + ":05")]
+    return [contest['name'],
+            str(date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(
+                int(time[0:2:1]) + 6) + ":05")]
+
 
 def destructure_codechef(contest):
     date = contest['start_time'].split(' ')[0]
     time = contest['start_time'].split(' ')[1]
-    return [contest['name'], str(date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(int(time[0:2:1]) + 6) + ":00")]
+    return [contest['name'], str(
+        date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(
+            int(time[0:2:1]) + 6) + ":00")]
 
 
+codeforces_display_list = list(map(destructure_codeforces_leetcode, data_codeforces))
 
-display_list = list(map(destructure_codeforces_leetcode, data_codeforces))[0:2:] + list(map(destructure_codechef,data_codechef))[0:2:] + list(map(destructure_codeforces_leetcode, data_leetcode))[0:2:]
+codechef_display_list = list(map(destructure_codechef, data_codechef))
+codechef_display_list.reverse()
 
+leetcode_display_list = list(map(destructure_codeforces_leetcode, data_leetcode))
+
+display_list = codeforces_display_list[0:2:] + codechef_display_list[0:2:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
