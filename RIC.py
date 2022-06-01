@@ -45,46 +45,60 @@ def destructure_codechef(contest):
             int(time[0:2:1]) + 6) + ":00")]
 
 
-codeforces_display_list = list(map(destructure_codeforces_leetcode, data_codeforces))
+codeforces_display_list = list(
+    map(destructure_codeforces_leetcode, data_codeforces))
 
 codechef_display_list = list(map(destructure_codechef, data_codechef))
 codechef_display_list.reverse()
 
-leetcode_display_list = list(map(destructure_codeforces_leetcode, data_leetcode))
+leetcode_display_list = list(
+    map(destructure_codeforces_leetcode, data_leetcode))
 
-display_list = codeforces_display_list[0:2:] + codechef_display_list[0:2:] + leetcode_display_list[0:2:]
+display_list = codeforces_display_list[0:2:] + \
+    codechef_display_list[0:2:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
-    dis = '\n**Upcoming Contests:**\n\n'
+    dis = ''
     i = 1
     for contest in display_list:
         dis = dis + \
-              f'{i}) **Name**: {contest[0]}\n \t**Date**: {contest[1]}\n\n'
+            f'{i}) **Name**: {contest[0]}\n \t**Date**: {contest[1]}\n\n'
         i = i + 1
-    return dis
+    m = discord.Embed(
+        title='\n**Upcoming Contests:**\n\n',
+        description=dis,
+        color=discord.Colour.blue()
+    )
+    return m
+
 
 @client.command(name='info')
 async def userInfo(ctx, name):
     async with aiohttp.ClientSession() as session:
         async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
             data = await response.json()
-            data = data['result'][0]
-            print('data', data)
-            rating = data['rating']
-            ft = data['firstName']
-            lt = data['lastName']
-            cntry = data['country']
-            rank = data['rank']
-            maxrt = data['maxRating']
-    m = discord.Embed(title='this is your info',
-                      description=f'Firstname : {ft}\nLastname : {lt}\nLast Rating : {rating}\ncountry : {cntry}\nRank : {rank}\nMax Rating : {maxrt}',
-                      color=discord.Colour.green())
-    await ctx.reply(embed=m)
+            # print(data)
+            if 'result' in data:
+                data = data['result'][0]
+                #         print('data', data)
+                rating = data['rating'] if 'rating' in data else '\t'
+                ft = data['firstName'] if 'firstName' in data else '\t'
+                lt = data['lastName'] if 'lastName' in data else '\t'
+                cntry = data['country'] if 'country' in data else '\t'
+                rank = data['rank'] if 'rank' in data else '\t'
+                maxrt = data['maxRating'] if 'maxRating' in data else '\t'
+                m = discord.Embed(title='this is your info',
+                                  description=f'**Requested by** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n',
+                                  color=discord.Colour.green())
+                await ctx.reply(embed=m)
+            else:
+                await ctx.reply('**404 Player Not found**')
+
 
 @client.command(name='contests')
 async def contest(ctx):
-    await ctx.reply(display(display_list))
+    await ctx.reply(embed=display(display_list))
 
 
 client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.G4ygGK.DUuxYU1R6MpX-4Li6Ms38v6FOk7UlYHN0ouHMg')
