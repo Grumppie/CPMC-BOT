@@ -136,7 +136,7 @@ async def userInfo(ctx, name):
                 m = discord.Embed(
                     title='this is your info',
                     description=f'**Request for** : \t{name}\n\n**Rank :** \t{ranking}\n\n**Problems Solved :** \t{problems}\n\n**Total Points :** \t{points}\n\n**Reputation :** \t{rep}\n\n**Thank you for using my services :smiley:**\n\n',
-                    color=discord.Colour.white())
+                    color=0xffffff)
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
