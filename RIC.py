@@ -22,7 +22,7 @@ async def on_ready():
 async def my_help(ctx):
     help_message = discord.Embed(
         title="**CPMC Discord Bot :robot:**",
-        description='\n ** Commands: :loudspeaker:** \n\n **.contests :** for upcomming contests :trophy:\n\n **.cf <username> :** for codeforces info of handle :person_bouncing_ball:\n\n**.lc <username> :** for leetcode info of handle :person_bouncing_ball:\n\n **Thank you for using my services :smiley:**',
+        description='\n :loudspeaker:** Commands: ** \n\n :trophy:**.contests :** for upcomming contests \n\n :person_bouncing_ball:**.cf <username> :** for codeforces info of handle\n\n:person_bouncing_ball:**.lc <username> :** for leetcode info of handle \n\n **Thank you for using my services :smiley:**',
         color=0xFFA500
     )
     await ctx.reply(embed=help_message)
@@ -116,7 +116,7 @@ async def userInfo(ctx, name):
                 m = discord.Embed(
                     title='this is your info',
                     description=f'**Request for** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
-                    color=discord.Colour.green())
+                    color=discord.Colour.red())
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
@@ -136,7 +136,7 @@ async def userInfo(ctx, name):
                 m = discord.Embed(
                     title='this is your info',
                     description=f'**Request for** : \t{name}\n\n**Rank :** \t{ranking}\n\n**Problems Solved :** \t{problems}\n\n**Total Points :** \t{points}\n\n**Reputation :** \t{rep}\n\n**Thank you for using my services :smiley:**\n\n',
-                    color=discord.Colour.green())
+                    color=discord.Colour.white())
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
