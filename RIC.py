@@ -5,6 +5,7 @@ import requests
 import os
 import aiohttp
 import asyncio
+import random
 
 client = commands.Bot(command_prefix='.')
 
@@ -81,13 +82,13 @@ def display(display_list):
     for contest in display_list:
         dis = dis + \
               f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
-    dis+= '**Thank you for using my services :smiley:**\n\n'
-    m = discord.Embed(
+    dis += '**Thank you for using my services :smiley:**\n\n'
+    message = discord.Embed(
         title='\n**Upcoming Contests:**\n\n',
         description=dis,
         color=discord.Colour.blue()
     )
-    return m
+    return message
 
 
 @client.command(name='contests')
@@ -123,4 +124,6 @@ async def userInfo(ctx, name):
                 await ctx.reply('**404 Player Not found**')
 
 
-client.run(os.environ['DISCORD_TOKEN'])
+
+# DISCORD_TOKEN
+client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.Gitpwg.jXoF7FBHj28jl1A5DGZsED5w-QgLhHMg1dhwio')
