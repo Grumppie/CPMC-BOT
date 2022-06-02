@@ -23,7 +23,7 @@ async def on_ready():
 async def my_help(ctx):
     help_message = discord.Embed(
         title="**CPMC Discord Bot :robot:**",
-        description='\n :loudspeaker:** Commands: ** \n\n :trophy:**.contests :** for upcomming contests \n\n :person_bouncing_ball:**.cf <username> :** for codeforces info of handle\n\n:person_bouncing_ball:**.lc <username> :** for leetcode info of handle \n\n **Thank you for using my services :smiley:**',
+        description='\n :loudspeaker:** Commands: ** \n\n :trophy:  **.contests :** for upcomming contests \n\n :person_bouncing_ball:  **.cf <username> :** for codeforces info of handle\n\n:person_bouncing_ball:  **.lc <username> :** for leetcode info of handle \n\n:person_bouncing_ball:  **.cc <username> :** for codechef info of handle \n\n:person_bouncing_ball:  **.randQ <difficulty_level> :** for random lc question \n\n :person_bouncing_ball:  **.randtag <tag> :** for random cf ques \n\n**Thank you for using my services :smiley:**',
         color=0xFFA500
     )
     await ctx.reply(embed=help_message)
@@ -102,21 +102,16 @@ async def contest(ctx):
 @client.command(name='cf')
 async def userInfo(ctx, name):
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
+        async with session.get('https://contest-details.herokuapp.com/api/codeforces/{}'.format(name)) as response:
             data = await response.json()
             # print(data)
-            if 'result' in data:
-                data = data['result'][0]
-                #         print('data', data)
+            if 'rating' in data:
                 rating = data['rating'] if 'rating' in data else '\t'
-                ft = data['firstName'] if 'firstName' in data else '\t'
-                lt = data['lastName'] if 'lastName' in data else '\t'
-                cntry = data['country'] if 'country' in data else '\t'
                 rank = data['rank'] if 'rank' in data else '\t'
-                maxrt = data['maxRating'] if 'maxRating' in data else '\t'
+                maxrt = data['max rating'] if 'max rating' in data else '\t'
                 m = discord.Embed(
-                    title='this is your info',
-                    description=f'**Request for** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
+                    title='this is your info for codeforces',
+                    description=f'**Request for** : \t{name}\n\n**Last Rating :** \t{rating}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
                     color=discord.Colour.red())
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
@@ -136,7 +131,7 @@ async def userInfo(ctx, name):
                 points = data['contribution_points'] if 'contribution_points' in data else '\t'
                 rep = data['reputation'] if 'reputation' in data else '\t'
                 m = discord.Embed(
-                    title='this is your info',
+                    title='this is your info for leetcode',
                     description=f'**Request for** : \t{name}\n\n**Rank :** \t{ranking}\n\n**Problems Solved :** \t{problems}\n\n**Total Points :** \t{points}\n\n**Reputation :** \t{rep}\n\n**Thank you for using my services :smiley:**\n\n',
                     color=0xffffff)
                 await ctx.message.author.send(embed=m)
@@ -144,7 +139,29 @@ async def userInfo(ctx, name):
             else:
                 await ctx.reply('**404 Player Not found**')
 
-
+# CC COMMAND FOR CODECHEF
+@client.command(name='cc')
+async def userInfo(ctx, name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://contest-details.herokuapp.com/api/codechef/{}'.format(name)) as response:
+            data = await response.json()
+            print(data)
+            if 'div' in data:
+                ranking = data['country rank'] if 'country rank' in data else '\t'
+                problems = data['problem solved'] if 'problem solved' in data else '\t'
+                div = data['div'] if 'div' in data else '\t'
+                stars = data['stars'] if 'stars' in data else '\t'
+                maxRt = data['max rating'] if 'max rating' in data else '\t'
+                current = data['rating'] if 'rating' in data else '\t'
+                m = discord.Embed(
+                    title='this is your info for codechef',
+                    description=f'**Request for** : \t{name}\n\n**Rank :** \t{ranking}\n\n**Div :** \t{div}\n\n**Stars :** \t{stars}\n\n**Rating :** \t{current}\n\n**Max Rating :** \t{maxRt}\n\n**Problems Solved :** \t{problems}\n\n**Thank you for using my services :smiley:**\n\n',
+                    color=discord.Colour.green())
+                await ctx.message.author.send(embed=m)
+                await ctx.reply('**Info was successfully sent to you!!**')
+            else:
+                await ctx.reply('**404 Player Not found**')
+                
 # RANDOM QUESTION
 # GET QUESTIONS FROM LEETCODE AND RETURN RANDOM QUESTION
 # REPLY IN SAME CHANNEL
@@ -173,12 +190,19 @@ def get_question_tag(tag):
     raw_questions = requests.get(url=URL_randtag)
     question_data = raw_questions.json()['result']['problems']
     random_index = random.randint(0,len(question_data))
-    print(question_data[random_index])
+    random_question = question_data[random_index]
+    link = f"https://codeforces.com/problemset/problem/{random_question['contestId']}/{random_question['index']}"
+    message = discord.Embed(
+        title="**Random Codeforces Question**",
+        description=f'\n\n**Difficulty: ** {random_question["index"]} \n\n **Title: ** {random_question["name"]} \n\n **Link :** {link}',
+        color=discord.Colour.dark_blue()
+    )
+    return message
 
 
 @client.command(name='randtag')
 async def rand_question_tag(ctx,tag):
-    get_question_tag(tag)
+    await ctx.reply(embed=get_question_tag(tag))
 
 # DISCORD_TOKEN
 client.run(os.environ['DISCORD_TOKEN'])
