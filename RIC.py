@@ -168,6 +168,17 @@ def get_questions(difficulty='medium'):
 async def rand_question(ctx, difficulty='medium'):
     await ctx.reply(embed=get_questions(difficulty))
 
+def get_question_tag(tag):
+    URL_randtag = f'https://codeforces.com/api/problemset.problems?tags={tag}'
+    raw_questions = requests.get(url=URL_randtag)
+    question_data = raw_questions.json()['result']['problems']
+    random_index = random.randint(0,len(question_data))
+    print(question_data[random_index])
+
+
+@client.command(name='randtag')
+async def rand_question_tag(ctx,tag):
+    get_question_tag(tag)
 
 # DISCORD_TOKEN
 client.run(os.environ['DISCORD_TOKEN'])
