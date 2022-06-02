@@ -23,7 +23,7 @@ async def on_ready():
 async def my_help(ctx):
     help_message = discord.Embed(
         title="**CPMC Discord Bot :robot:**",
-        description='\n ** Commands: :loudspeaker:** \n\n **.contests :** for upcomming contests :trophy:\n\n **.info <username> :** for info of handle :person_bouncing_ball:\n\n **Thank you for using my services :smiley:**',
+        description='\n :loudspeaker:** Commands: ** \n\n :trophy:**.contests :** for upcomming contests \n\n :person_bouncing_ball:**.cf <username> :** for codeforces info of handle\n\n:person_bouncing_ball:**.lc <username> :** for leetcode info of handle \n\n **Thank you for using my services :smiley:**',
         color=0xFFA500
     )
     await ctx.reply(embed=help_message)
@@ -96,10 +96,10 @@ async def contest(ctx):
     await ctx.reply(embed=display(display_list))
 
 
-# INFO COMMAND
+# CF COMMAND FOR CODEFORCES
 # GET USERINFO
 # REPLY IN DM
-@client.command(name='info')
+@client.command(name='cf')
 async def userInfo(ctx, name):
     async with aiohttp.ClientSession() as session:
         async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
@@ -117,7 +117,27 @@ async def userInfo(ctx, name):
                 m = discord.Embed(
                     title='this is your info',
                     description=f'**Request for** : \t{name}\n\n**Firstname :** \t{ft}\n\n**Lastname :** \t{lt}\n\n**Last Rating :** \t{rating}\n\n**country :** \t{cntry}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
-                    color=discord.Colour.green())
+                    color=discord.Colour.red())
+                await ctx.message.author.send(embed=m)
+                await ctx.reply('**Info was successfully sent to you!!**')
+            else:
+                await ctx.reply('**404 Player Not found**')
+
+# LC COMMAND FOR LEETCODE
+@client.command(name='lc')
+async def userInfo(ctx, name):
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://competitive-coding-api.herokuapp.com/api/leetcode/{}'.format(name)) as response:
+            data = await response.json()
+            if 'ranking' in data:
+                ranking = data['ranking'] if 'ranking' in data else '\t'
+                problems = data['total_problems_solved'] if 'total_problems_solved' in data else '\t'
+                points = data['contribution_points'] if 'contribution_points' in data else '\t'
+                rep = data['reputation'] if 'reputation' in data else '\t'
+                m = discord.Embed(
+                    title='this is your info',
+                    description=f'**Request for** : \t{name}\n\n**Rank :** \t{ranking}\n\n**Problems Solved :** \t{problems}\n\n**Total Points :** \t{points}\n\n**Reputation :** \t{rep}\n\n**Thank you for using my services :smiley:**\n\n',
+                    color=0xffffff)
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
