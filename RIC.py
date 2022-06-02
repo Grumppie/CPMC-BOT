@@ -170,4 +170,4 @@ async def rand_question(ctx, difficulty='medium'):
 
 
 # DISCORD_TOKEN
-client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.Gitpwg.jXoF7FBHj28jl1A5DGZsED5w-QgLhHMg1dhwio')
+client.run(os.environ['DISCORD_TOKEN'])
