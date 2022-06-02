@@ -123,6 +123,7 @@ async def userInfo(ctx, name):
             else:
                 await ctx.reply('**404 Player Not found**')
 
+
 # LC COMMAND FOR LEETCODE
 @client.command(name='lc')
 async def userInfo(ctx, name):
@@ -143,6 +144,29 @@ async def userInfo(ctx, name):
             else:
                 await ctx.reply('**404 Player Not found**')
 
+
+# RANDOM QUESTION
+# GET QUESTIONS FROM LEETCODE AND RETURN RANDOM QUESTION
+# REPLY IN SAME CHANNEL
+def get_questions(difficulty='medium'):
+    URL_question = f'https://leetcode-api-1d31.herokuapp.com/api/questions/{difficulty}'
+    raw_questions = requests.get(url=URL_question)
+    question_data = raw_questions.json()['data']['questiions']
+    random_index = random.randint(0, len(question_data))
+    # print(question_data[random_index])
+    random_question = question_data[random_index]
+    link = f"https://leetcode.com/problems/{random_question['titleSlug']}"
+    message = discord.Embed(
+        title="**Random Question**",
+        description=f'\n\n**Difficulty: ** {random_question["difficulty"]} \n\n **Title: ** {random_question["title"]} \n\n **Link :** {link}',
+        color=discord.Colour.green()
+    )
+    return message
+
+
+@client.command(name='randQ')
+async def rand_question(ctx, difficulty='medium'):
+    await ctx.reply(embed=get_questions(difficulty))
 
 
 # DISCORD_TOKEN
