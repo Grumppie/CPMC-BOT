@@ -6,6 +6,8 @@ import os
 import aiohttp
 import asyncio
 import random
+import numpy as np
+import matplotlib.pyplot as plt
 
 client = commands.Bot(command_prefix='.')
 
@@ -74,14 +76,14 @@ leetcode_display_list = list(
 leetcode_display_list.reverse()
 
 display_list = codeforces_display_list[0:2:] + \
-               codechef_display_list[0:2:] + leetcode_display_list[0:2:]
+    codechef_display_list[0:2:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
     dis = ''
     for contest in display_list:
         dis = dis + \
-              f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
+            f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
     dis += '**Thank you for using my services :smiley:**\n\n'
     message = discord.Embed(
         title='\n**Upcoming Contests:**\n\n',
@@ -116,7 +118,7 @@ async def userInfo(ctx, name):
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
-                await ctx.reply('**404 Player Not found**')
+                await ctx.reply('**400 Player Not found or contests not given**')
 
 
 # LC COMMAND FOR LEETCODE
@@ -137,7 +139,8 @@ async def userInfo(ctx, name):
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
-                await ctx.reply('**404 Player Not found**')
+                await ctx.reply('**400 Player Not found or contests not given**')
+
 
 # CC COMMAND FOR CODECHEF
 @client.command(name='cc')
@@ -160,8 +163,9 @@ async def userInfo(ctx, name):
                 await ctx.message.author.send(embed=m)
                 await ctx.reply('**Info was successfully sent to you!!**')
             else:
-                await ctx.reply('**404 Player Not found**')
-                
+                await ctx.reply('**400 Player Not found or contests not given**')
+
+
 # RANDOM QUESTION
 # GET QUESTIONS FROM LEETCODE AND RETURN RANDOM QUESTION
 # REPLY IN SAME CHANNEL
@@ -185,11 +189,12 @@ def get_questions(difficulty='medium'):
 async def rand_question(ctx, difficulty='medium'):
     await ctx.reply(embed=get_questions(difficulty))
 
+
 def get_question_tag(tag):
     URL_randtag = f'https://codeforces.com/api/problemset.problems?tags={tag}'
     raw_questions = requests.get(url=URL_randtag)
     question_data = raw_questions.json()['result']['problems']
-    random_index = random.randint(0,len(question_data))
+    random_index = random.randint(0, len(question_data))
     random_question = question_data[random_index]
     link = f"https://codeforces.com/problemset/problem/{random_question['contestId']}/{random_question['index']}"
     message = discord.Embed(
@@ -201,8 +206,35 @@ def get_question_tag(tag):
 
 
 @client.command(name='randtag')
-async def rand_question_tag(ctx,tag):
+async def rand_question_tag(ctx, tag):
     await ctx.reply(embed=get_question_tag(tag))
+
+
+font = {'size': 6}
+
+
+@client.command(name='graph')
+async def graph_disp(ctx, user):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'https://contest-details.herokuapp.com/api/codechef/{user}') as response:
+            data = await response.json()
+            if 'contests' in data:
+                x = np.arange(0, len(data['contests']))
+                y = data['contests']
+                plt.clf()
+                for i_x, i_y in zip(x, y):
+                    plt.text(i_x, i_y, '{}'.format(i_y), fontdict=font)
+                plt.plot(x, y)
+                plt.xlabel("time period")
+                plt.ylabel("Rating")
+                plt.title("Codechef Rating")
+                plt.savefig(f"{user}.png")
+
+                file = discord.File(f'{user}.png', filename=f'{user}.png')
+                await ctx.message.author.send(file=file)
+            else:
+                await ctx.reply('**400 BAD REQUEST**')
+
 
 # DISCORD_TOKEN
 client.run(os.environ['DISCORD_TOKEN'])
