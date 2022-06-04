@@ -236,6 +236,5 @@ async def graph_disp(ctx, user):
                 await ctx.reply('**400 Player Not found or contests not given**')
 
 
-# DISCORD_TOKEN
 client.run(os.environ['DISCORD_TOKEN'])
 
