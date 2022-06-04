@@ -253,7 +253,7 @@ def get_questions(difficulty='medium'):
     return message
 
 
-@client.command(name='randQ')
+@client.command(name='rq')
 async def rand_question(ctx, difficulty='medium'):
     await ctx.reply(embed=get_questions(difficulty))
 
@@ -273,7 +273,7 @@ def get_question_tag(tag):
     return message
 
 
-@client.command(name='randtag')
+@client.command(name='rt')
 async def rand_question_tag(ctx, tag):
     await ctx.reply(embed=get_question_tag(tag))
 
