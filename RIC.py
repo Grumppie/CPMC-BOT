@@ -233,9 +233,9 @@ async def graph_disp(ctx, user):
                 file = discord.File(f'{user}.png', filename=f'{user}.png')
                 await ctx.message.author.send(file=file)
             else:
-                await ctx.reply('**400 BAD REQUEST**')
+                await ctx.reply('**400 Player Not found or contests not given**')
 
 
 # DISCORD_TOKEN
-# client.run(os.environ['DISCORD_TOKEN'])
+client.run(os.environ['DISCORD_TOKEN'])
 
