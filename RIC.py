@@ -10,7 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from asyncio import sleep as s
 from datetime import datetime, time, timedelta, date
-channel_id = 861613962508369934
+
+client = commands.Bot(command_prefix='.')
 
 
 def get_contest_date():
@@ -61,30 +62,41 @@ async def called_once_a_day(contest, flag):  # Fired every day
 
 
 async def background_task():
-    # now = datetime.utcnow()
     for contest in get_contest_date():
         if contest[0] == date.today():
+            # WHEN = contest[1][0:8:]
+            now = datetime.utcnow()
+            WHEN = now.time()
             if contest[3] == 1:
                 await called_once_a_day(contest[2], 1)
+                if now.time() > now.time():  # Make sure loop doesn't start after {WHEN} as then it will send immediately the first time as negative seconds will make the sleep yield instantly
+                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
+                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
+                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start
+                while True:
+                    # now = datetime.utcnow()  # You can do now() or a specific timezone if that matters, but I'll leave it with utcnow
+                    target_time = datetime.combine(now.date(), WHEN)  # 6:00 PM today (In UTC)
+                    seconds_until_target = (target_time - now).total_seconds()
+                    await asyncio.sleep(seconds_until_target)  # Sleep until we hit the target time
+                    await called_once_a_day(contest[2], 1)  # Call the helper function that sends the message
+                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
+                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
+                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start a new iteration
             else:
                 await called_once_a_day(contest[2], 0)
-
-    # if now.time() > WHEN:  # Make sure loop doesn't start after {WHEN} as then it will send immediately the first time as negative seconds will make the sleep yield instantly
-    #     tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-    #     seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-    #     await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start
-    # while True:
-    #     now = datetime.utcnow()  # You can do now() or a specific timezone if that matters, but I'll leave it with utcnow
-    #     target_time = datetime.combine(now.date(), WHEN)  # 6:00 PM today (In UTC)
-    #     seconds_until_target = (target_time - now).total_seconds()
-    #     await asyncio.sleep(seconds_until_target)  # Sleep until we hit the target time
-    #     await called_once_a_day()  # Call the helper function that sends the message
-    #     tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-    #     seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-    #     await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start a new iteration
-
-
-client = commands.Bot(command_prefix='.')
+                if now.time() > now.time():  # Make sure loop doesn't start after {WHEN} as then it will send immediately the first time as negative seconds will make the sleep yield instantly
+                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
+                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
+                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start
+                while True:
+                    # now = datetime.utcnow()  # You can do now() or a specific timezone if that matters, but I'll leave it with utcnow
+                    target_time = datetime.combine(now.date(), WHEN)  # 6:00 PM today (In UTC)
+                    seconds_until_target = (target_time - now).total_seconds()
+                    await asyncio.sleep(seconds_until_target)  # Sleep until we hit the target time
+                    await called_once_a_day(contest[2], 0)  # Call the helper function that sends the message
+                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
+                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
+                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start a new iteration
 
 
 # ONREADY
@@ -101,7 +113,7 @@ async def on_ready():
 async def my_help(ctx):
     help_message = discord.Embed(
         title="**CPMC Discord Bot :robot:**",
-        description='\n :loudspeaker:** Commands: ** \n\n :trophy:  **.contests :** for upcomming contests \n\n :person_bouncing_ball:  **.rating <platform> <username> :** for rating info of handle \n\n\t platform options: \n\n\t\tcf for codeforces \n\n\t\tcc for codechef \n\n\t\tlc for leetcode \n\n:person_bouncing_ball: **.graph <platform> <username>** \n\nplatform options: \n\n\t\tcf for codeforces \n\n\t\tcc for codechef\n\n:person_bouncing_ball:  **.rq <difficulty_level> :** for random lc question \n\n :person_bouncing_ball:  **.rt <tag> :** for random codeforces questions with tag \n\n**Thank you for using my services :smiley:**',
+        description='\n :loudspeaker:** Commands: ** \n\n :trophy:  **.contests :** for upcomming contests \n\n :joystick:  **.rating <platform> <username> :** for rating info of handle \n\n\tplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef \n\n\t\t:chart_with_upwards_trend:  lc for leetcode \n\n:joystick: **.graph <platform> <username>** \n\nplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef\n\n:joystick:  **.rq <difficulty_level> :** for random leetcode question\n\n options for difficulty_level: \n\n :muscle: Easy \n\n :muscle: Medium \n\n :muscle: Hard \n\n :joystick:  **.rt <tag> :** for random codeforces questions with tag \n\n Options for tags: https://codeforces.com/blog/entry/14565 \n\n**Thank you for using my services :smiley:**',
         color=0xFFA500
     )
     await ctx.reply(embed=help_message)
@@ -178,13 +190,13 @@ async def contest(ctx):
 async def rating(ctx, platform, name):
     if platform == 'cf':
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://contest-details.herokuapp.com/api/codeforces/{}'.format(name)) as response:
+            async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
                 data = await response.json()
 
                 if 'rating' in data:
                     rating = data['rating'] if 'rating' in data else '\t'
                     rank = data['rank'] if 'rank' in data else '\t'
-                    maxrt = data['max rating'] if 'max rating' in data else '\t'
+                    maxrt = data['maxRating'] if 'maxRating' in data else '\t'
                     m = discord.Embed(
                         title='this is your info for codeforces',
                         description=f'**Request for** : \t{name}\n\n**Last Rating :** \t{rating}\n\n**Rank :** \t{rank}\n\n**Max Rating :** \t{maxrt}\n\n**Thank you for using my services :smiley:**\n\n',
@@ -253,7 +265,7 @@ def get_questions(difficulty='medium'):
     return message
 
 
-@client.command(name='randQ')
+@client.command(name='rq')
 async def rand_question(ctx, difficulty='medium'):
     await ctx.reply(embed=get_questions(difficulty))
 
@@ -273,7 +285,7 @@ def get_question_tag(tag):
     return message
 
 
-@client.command(name='randtag')
+@client.command(name='rt')
 async def rand_question_tag(ctx, tag):
     await ctx.reply(embed=get_question_tag(tag))
 
@@ -281,35 +293,65 @@ async def rand_question_tag(ctx, tag):
 font = {'size': 7}
 
 
+def filterRating(contest):
+    return contest['newRating']
+
+
 @client.command(name='graph')
 async def graph_disp(ctx, platform, user):
-    _platform = ''
     if platform == 'cc':
-        _platform = 'codechef'
-    elif platform == 'cf':
-        _platform = 'codeforces'
-    else:
-        await ctx.reply('**Enter valid platform**')
-        return
-    async with aiohttp.ClientSession() as session:
-        async with session.get(f'https://contest-details.herokuapp.com/api/{_platform}/{user}') as response:
-            data = await response.json()
-            if 'contests' in data:
-                x = np.arange(0, len(data['contests']))
-                y = data['contests']
-                plt.clf()
-                for i_x, i_y in zip(x, y):
-                    plt.text(i_x, i_y, '{}'.format(i_y), fontdict=font)
-                plt.plot(x, y)
-                plt.xlabel("time period")
-                plt.ylabel("Rating")
-                plt.title("Codechef Rating")
-                plt.savefig(f"{user}.png")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://contest-details.herokuapp.com/api/codechef/{user}') as response:
+                data = await response.json()
+                if 'contests' in data:
+                    x = np.arange(0, len(data['contests']))
+                    y = data['contests']
+                    plt.clf()
+                    for i_x, i_y in zip(x, y):
+                        plt.text(i_x, i_y, '{}'.format(i_y), fontdict=font)
+                    plt.plot(x, y)
+                    plt.xlabel("time period")
+                    plt.ylabel("Rating")
+                    plt.title("Codechef Rating")
+                    plt.savefig(f"{user}.png")
 
-                file = discord.File(f'{user}.png', filename=f'{user}.png')
-                await ctx.message.author.send(file=file)
-            else:
-                await ctx.reply('**400 Player Not found or contests not given**')
+                    file = discord.File(f'{user}.png', filename=f'{user}.png')
+                    await ctx.message.author.send(file=file)
+                    await ctx.reply('**Graph was successfully sent to you!!**')
+                else:
+                    await ctx.reply('**400 Player Not found or contests not given**')
+    elif platform == 'cf':
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://codeforces.com/api/user.rating?handle={user}') as response:
+                data = await response.json()
+                if 'result' in data:
+                    rating_list = list(map(filterRating, data['result']))
+                    x = np.arange(0, len(rating_list))
+                    y = rating_list
+                    plt.clf()
+                    for i_x, i_y in zip(x, y):
+                        plt.text(i_x, i_y, '{}'.format(i_y), fontdict=font)
+                    plt.plot(x, y)
+                    plt.xlabel("time period")
+                    plt.ylabel("Rating")
+                    plt.title("Codeforces Rating")
+                    plt.savefig(f"{user}.png")
+
+                    file = discord.File(f'{user}.png', filename=f'{user}.png')
+                    await ctx.message.author.send(file=file)
+                    await ctx.reply('**Graph was successfully sent to you!!**')
+                else:
+                    await ctx.reply('**400 Player Not found or contests not given**')
+
+
+@client.command(name='recommend')
+async def recommend_problem(ctx, platform, name):
+    if platform == 'cf':
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https: // codeforces.com / api / user.info?handles={user}') as response:
+                data = response.json()
+                if 'result' in data:
+                    rating = data['result']['rating']
 
 
 client.loop.create_task(background_task())
