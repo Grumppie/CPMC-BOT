@@ -347,5 +347,5 @@ async def graph_disp(ctx, platform, user):
 
 
 client.loop.create_task(background_task())
-# client.run(os.environ['DISCORD_TOKEN'])
-client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.GWplLb.ip3bMF4C8mgBU68VRG1Uw0AhPrZ13NNSaaK55c')
+client.run(os.environ['DISCORD_TOKEN'])
+
