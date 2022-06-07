@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from asyncio import sleep as s
 from datetime import datetime, time, timedelta, date
 
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix=';')
 
 
 def get_contest_date():
@@ -109,11 +109,11 @@ async def on_ready():
 # HELP COMMAND
 # DISPLAY ALL THE COMMANDS
 # REPLY IN SAME CHANNEL
-@client.command(name='helpMe')
+@client.command(name='helpme')
 async def my_help(ctx):
     help_message = discord.Embed(
         title="**CPMC Discord Bot :robot:**",
-        description='\n :loudspeaker:** Commands: ** \n\n :trophy:  **.contests :** for upcomming contests \n\n :joystick:  **.rating <platform> <username> :** for rating info of handle \n\n\tplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef \n\n\t\t:chart_with_upwards_trend:  lc for leetcode \n\n:joystick: **.graph <platform> <username>** \n\nplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef\n\n:joystick:  **.rq <difficulty_level> :** for random leetcode question\n\n options for difficulty_level: \n\n :muscle: Easy \n\n :muscle: Medium \n\n :muscle: Hard \n\n :joystick:  **.rt <tag> :** for random codeforces questions with tag \n\n Options for tags: https://codeforces.com/blog/entry/14565 \n\n**Thank you for using my services :smiley:**',
+        description='\n :loudspeaker:** Commands: ** \n\n :trophy:  **//contests :** for upcomming contests \n\n :joystick:  **//rating <platform> <username> :** for rating info of handle \n\n\tplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef \n\n\t\t:chart_with_upwards_trend:  lc for leetcode \n\n:joystick: **//graph <platform> <username>** \n\nplatform options: \n\n\t\t:chart_with_upwards_trend:  cf for codeforces \n\n\t\t:chart_with_upwards_trend:  cc for codechef\n\n:joystick:  **//rq <difficulty_level> :** for random leetcode question\n\n options for difficulty_level: \n\n :muscle: Easy \n\n :muscle: Medium \n\n :muscle: Hard \n\n :joystick:  **//rt <tag> :** for random codeforces questions with tag \n\n Options for tags: https://codeforces.com/blog/entry/14565 \n\n**Thank you for using my services :smiley:**',
         color=0xFFA500
     )
     await ctx.reply(embed=help_message)
@@ -274,6 +274,8 @@ async def rand_question(ctx, difficulty='medium'):
 def get_question_tag(tag):
     URL_randtag = f'https://codeforces.com/api/problemset.problems?tags={tag}'
     raw_questions = requests.get(url=URL_randtag)
+    if 'result' not in raw_questions.json():
+        return discord.Embed(title = 'Tag not found')
     question_data = raw_questions.json()['result']['problems']
     random_index = random.randint(0, len(question_data))
     random_question = question_data[random_index]
@@ -284,7 +286,6 @@ def get_question_tag(tag):
         color=discord.Colour.dark_blue()
     )
     return message
-
 
 @client.command(name='rt')
 async def rand_question_tag(ctx, tag):
@@ -345,7 +346,6 @@ async def graph_disp(ctx, platform, user):
                     await ctx.reply('**400 Player Not found or contests not given**')
 
 
-
 client.loop.create_task(background_task())
-client.run(os.environ['DISCORD_TOKEN'])
-
+# client.run(os.environ['DISCORD_TOKEN'])
+client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.Gp7mAK.WZWKLNMZKQW79peFFJW14JESfNvDH2A8iCH1PE')
