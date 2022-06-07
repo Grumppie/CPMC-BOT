@@ -193,7 +193,8 @@ async def rating(ctx, platform, name):
             async with session.get('https://codeforces.com/api/user.info?handles={}'.format(name)) as response:
                 data = await response.json()
 
-                if 'rating' in data:
+                if 'result' in data:
+                    data = data['result'][0]
                     rating = data['rating'] if 'rating' in data else '\t'
                     rank = data['rank'] if 'rank' in data else '\t'
                     maxrt = data['maxRating'] if 'maxRating' in data else '\t'
@@ -346,4 +347,5 @@ async def graph_disp(ctx, platform, user):
 
 
 client.loop.create_task(background_task())
-client.run(os.environ['DISCORD_TOKEN'])
+# client.run(os.environ['DISCORD_TOKEN'])
+client.run('OTc4NzMxNjAwMzc0Mjg0MzIy.GWplLb.ip3bMF4C8mgBU68VRG1Uw0AhPrZ13NNSaaK55c')
