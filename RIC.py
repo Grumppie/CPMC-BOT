@@ -344,15 +344,6 @@ async def graph_disp(ctx, platform, user):
                     await ctx.reply('**400 Player Not found or contests not given**')
 
 
-@client.command(name='recommend')
-async def recommend_problem(ctx, platform, name):
-    if platform == 'cf':
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'https: // codeforces.com / api / user.info?handles={user}') as response:
-                data = response.json()
-                if 'result' in data:
-                    rating = data['result']['rating']
-
 
 client.loop.create_task(background_task())
 client.run(os.environ['DISCORD_TOKEN'])
