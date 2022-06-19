@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
 import requests
 import os
 import aiohttp
@@ -8,102 +7,16 @@ import asyncio
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-from asyncio import sleep as s
 from datetime import datetime, time, timedelta, date
 
 client = commands.Bot(command_prefix=';')
 
-
-def get_contest_date():
-    URL_codeforces = "https://kontests.net/api/v1/codeforces"
-    URL_codechef = "https://kontests.net/api/v1/code_chef"
-    URL_leetcode = "https://kontests.net/api/v1/leet_code"
-
-    # sending get request and saving the response as response object
-    request_codeforces = requests.get(url=URL_codeforces)
-    request_codechef = requests.get(url=URL_codechef)
-    request_leetcode = requests.get(url=URL_leetcode)
-
-    # extracting data in json format
-    data_codeforces = request_codeforces.json()
-    data_codechef = request_codechef.json()
-    data_leetcode = request_leetcode.json()
-    data_codechef.reverse()
-    data_leetcode.reverse()
-    date_codeforces = data_codeforces[0]['start_time'].split('T')
-    date_leetcode = data_leetcode[0]['start_time'].split('T')
-    date_codechef = data_codechef[0]['start_time'].split(" ")
-    return [[date_codeforces[0], date_codeforces[1][0:8:], data_codeforces[0], 1],
-            [date_leetcode[0], date_leetcode[1][0:8:], data_leetcode[0], 1],
-            [date_codechef[0], date_codechef[1], data_codechef[0], 0]]
-
-
-async def called_once_a_day(contest, flag):  # Fired every day
-    await client.wait_until_ready()  # Make sure your guild cache is ready so the channel can be found via get_channel
-    channel = client.get_channel(
-        channel_id)  # Note: It's more efficient to do bot.get_guild(guild_id).get_channel(channel_id) as there's less looping involved, but just get_channel still works fine
-    if flag == 1:
-        date = contest['start_time'].split('T')[0]
-        time = contest['start_time'].split('T')[1]
-        l = [contest['name'], str(
-            date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(
-                int(time[0:2:1]) + 6) + ":00")]
-        await channel.send(embed=discord.Embed(title=f'**Upcomming contest**',
-                                               description=f':trophy:  **Name**: {l[0]}\n\n \t :clock8:  **Date**: {l[1]}\n\n\n'))
-
-    else:
-        date = contest['start_time'].split(' ')[0]
-        time = contest['start_time'].split(' ')[1]
-        l = [contest['name'], str(
-            date.split('-')[2] + "/" + date.split('-')[1] + "/" + date.split('-')[0] + " at " + str(
-                int(time[0:2:1]) + 6) + ":00")]
-        await channel.send(embed=discord.Embed(title=f'**Upcomming Contest Today**',
-                                               description=f':trophy:  **Name**: {l[0]}\n\n \t :clock8:  **Date**: {l[1]}\n\n\n'))
-
-
-async def background_task():
-    for contest in get_contest_date():
-        if contest[0] == date.today():
-            # WHEN = contest[1][0:8:]
-            now = datetime.utcnow()
-            WHEN = now.time()
-            if contest[3] == 1:
-                await called_once_a_day(contest[2], 1)
-                if now.time() > now.time():  # Make sure loop doesn't start after {WHEN} as then it will send immediately the first time as negative seconds will make the sleep yield instantly
-                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start
-                while True:
-                    # now = datetime.utcnow()  # You can do now() or a specific timezone if that matters, but I'll leave it with utcnow
-                    target_time = datetime.combine(now.date(), WHEN)  # 6:00 PM today (In UTC)
-                    seconds_until_target = (target_time - now).total_seconds()
-                    await asyncio.sleep(seconds_until_target)  # Sleep until we hit the target time
-                    await called_once_a_day(contest[2], 1)  # Call the helper function that sends the message
-                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start a new iteration
-            else:
-                await called_once_a_day(contest[2], 0)
-                if now.time() > now.time():  # Make sure loop doesn't start after {WHEN} as then it will send immediately the first time as negative seconds will make the sleep yield instantly
-                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start
-                while True:
-                    # now = datetime.utcnow()  # You can do now() or a specific timezone if that matters, but I'll leave it with utcnow
-                    target_time = datetime.combine(now.date(), WHEN)  # 6:00 PM today (In UTC)
-                    seconds_until_target = (target_time - now).total_seconds()
-                    await asyncio.sleep(seconds_until_target)  # Sleep until we hit the target time
-                    await called_once_a_day(contest[2], 0)  # Call the helper function that sends the message
-                    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
-                    seconds = (tomorrow - now).total_seconds()  # Seconds until tomorrow (midnight)
-                    await asyncio.sleep(seconds)  # Sleep until tomorrow and then the loop will start a new iteration
-
-
 # ONREADY
+
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
-    # print(get_contest_date())
 
 
 # HELP COMMAND
@@ -164,14 +77,14 @@ leetcode_display_list = list(
 leetcode_display_list.reverse()
 
 display_list = codeforces_display_list[0:2:] + \
-               codechef_display_list[0:2:] + leetcode_display_list[0:2:]
+    codechef_display_list[0:2:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
     dis = ''
     for contest in display_list:
         dis = dis + \
-              f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
+            f':trophy:  **Name**: {contest[0]}\n\n \t :clock8:  **Date**: {contest[1]}\n\n\n'
     dis += '**Thank you for using my services :smiley:**\n\n'
     message = discord.Embed(
         title='\n**Upcoming Contests:**\n\n',
@@ -275,7 +188,7 @@ def get_question_tag(tag):
     URL_randtag = f'https://codeforces.com/api/problemset.problems?tags={tag}'
     raw_questions = requests.get(url=URL_randtag)
     if 'result' not in raw_questions.json():
-        return discord.Embed(title = 'Tag not found')
+        return discord.Embed(title='Tag not found')
     question_data = raw_questions.json()['result']['problems']
     random_index = random.randint(0, len(question_data))
     random_question = question_data[random_index]
@@ -286,6 +199,7 @@ def get_question_tag(tag):
         color=discord.Colour.dark_blue()
     )
     return message
+
 
 @client.command(name='rt')
 async def rand_question_tag(ctx, tag):
