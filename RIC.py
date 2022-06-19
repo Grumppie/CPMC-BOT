@@ -259,6 +259,4 @@ async def graph_disp(ctx, platform, user):
                 else:
                     await ctx.reply('**400 Player Not found or contests not given**')
 
-
-client.loop.create_task(background_task())
 client.run(os.environ['DISCORD_TOKEN'])
