@@ -168,7 +168,6 @@ def get_questions(difficulty='medium'):
     raw_questions = requests.get(url=URL_question)
     question_data = raw_questions.json()['data']['questiions']
     random_index = random.randint(0, len(question_data))
-    # print(question_data[random_index])
     random_question = question_data[random_index]
     link = f"https://leetcode.com/problems/{random_question['titleSlug']}"
     message = discord.Embed(
