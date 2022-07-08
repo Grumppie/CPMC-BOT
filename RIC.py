@@ -72,12 +72,13 @@ codeforces_display_list = list(
 codechef_display_list = list(map(destructure_codechef, data_codechef))
 codechef_display_list.reverse()
 
+
 leetcode_display_list = list(
     map(destructure_codeforces_leetcode, data_leetcode))
 leetcode_display_list.reverse()
 
 display_list = codeforces_display_list[0:2:] + \
-    codechef_display_list[0:2:] + leetcode_display_list[0:2:]
+    codechef_display_list[2:4:] + leetcode_display_list[0:2:]
 
 
 def display(display_list):
@@ -260,5 +261,4 @@ async def graph_disp(ctx, platform, user):
                     await ctx.reply('**400 Player Not found or contests not given**')
 
 
-client.loop.create_task(background_task())
 client.run(os.environ['DISCORD_TOKEN'])
