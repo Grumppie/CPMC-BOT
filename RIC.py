@@ -169,7 +169,6 @@ def get_questions(difficulty='medium'):
     raw_questions = requests.get(url=URL_question)
     question_data = raw_questions.json()['data']['questiions']
     random_index = random.randint(0, len(question_data))
-    # print(question_data[random_index])
     random_question = question_data[random_index]
     link = f"https://leetcode.com/problems/{random_question['titleSlug']}"
     message = discord.Embed(
@@ -259,6 +258,4 @@ async def graph_disp(ctx, platform, user):
                     await ctx.reply('**Graph was successfully sent to you!!**')
                 else:
                     await ctx.reply('**400 Player Not found or contests not given**')
-
-
 client.run(os.environ['DISCORD_TOKEN'])
